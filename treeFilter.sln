@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "treeFilter", "treeFilter\treeFilter.csproj", "{76FDC9F9-3131-4895-A72B-7815F8992CDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76FDC9F9-3131-4895-A72B-7815F8992CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FDC9F9-3131-4895-A72B-7815F8992CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FDC9F9-3131-4895-A72B-7815F8992CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FDC9F9-3131-4895-A72B-7815F8992CDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
