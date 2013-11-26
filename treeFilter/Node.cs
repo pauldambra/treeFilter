@@ -63,47 +63,52 @@ namespace treeFilter
         }
 
         /// <summary>
-        /// Bottom Up Breadth first search for nodes which are neither explicitly nor implicitly included
+        /// Partial Bottom Up Breadth first search for nodes which are neither explicitly nor implicitly included
         /// </summary>
         public static Node Filter(Node startNode, int[] includedNodes)
         {
-            var stack = GetReverseStack(startNode, includedNodes);
-            while (stack.Count != 0)
-            {
-                var current = stack.Pop();
-                if (current.IsIncluded(includedNodes)) continue;
-
-                if (current.IsRoot())
-                {
-                    return null;
-                }
-                current.RemoveChildReferencesToNode()
-                       .RemoveParentReferencesToNode();
-            }
-            return startNode;
-        }
-
-        /// <summary>
-        /// Breadth first search to build a stack with children on top 
-        /// and root at the bottom
-        /// </summary>
-        private static Stack<Node> GetReverseStack(Node startNode, int[] includedNodes)
-        {
-            var queue = new Queue<Node>();
-            queue.Enqueue(startNode);
-
             var stack = new Stack<Node>();
+             var queue = new Queue<Node>();
+            queue.Enqueue(startNode);
 
             while (queue.Count != 0)
             {
                 var current = queue.Dequeue();
-                stack.Push(current);
-                foreach (var child in current.Children)
+                if (current.IsIncluded(includedNodes))
                 {
-                    queue.Enqueue(child);
+                    stack.Push(current);
+                    foreach (var child in current.Children)
+                    {
+                        queue.Enqueue(child);
+                    }
+                }
+                else
+                {
+                    if (current.IsRoot())
+                    {
+                        return null;
+                    }
+                    current.RemoveChildReferencesToNode()
+                           .RemoveParentReferencesToNode();
                 }
             }
-            return stack;
+
+            //walk back up from bottom level of included nodes
+            while (stack.Count != 0)
+            {
+                var current = stack.Pop();
+                //all nodes in stack are included
+                //do they have any excluded parents?
+                for (var i = 0; i < current.Parents.Count; i++)
+                {
+                    var parent = current.Parents.ElementAt(i);
+                    if (parent.IsIncluded(includedNodes)) continue;
+                    parent.RemoveChildReferencesToNode()
+                          .RemoveParentReferencesToNode();
+                    i--;
+                }
+            }
+            return startNode;
         }
     }
 
