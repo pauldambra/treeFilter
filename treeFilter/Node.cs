@@ -13,8 +13,8 @@ namespace treeFilter
         }
 
         public int Id { get; set; }
-        public ICollection<Node> Parents { get; set; }
-        public ICollection<Node> Children { get; set; }
+        public ICollection<Node> Parents { get; private set; }
+        public ICollection<Node> Children { get; private set; }
 
         public static Node CreateNode(int id, Node parent)
         {
@@ -67,8 +67,23 @@ namespace treeFilter
         /// </summary>
         public static Node Filter(Node startNode, int[] includedNodes)
         {
+            if (startNode.IsRoot() && !startNode.IsIncluded(includedNodes))
+            {
+                return null;
+            }
+
+            var stack = BreadthFirstBranchExclusion(startNode, includedNodes);
+            CheckStackForDanglingExcludedParents(includedNodes, stack);
+            return startNode;
+        }
+
+        /// <summary>
+        /// Breadth first traversal that rooms branches which are not included
+        /// </summary>
+        private static Stack<Node> BreadthFirstBranchExclusion(Node startNode, int[] includedNodes)
+        {
             var stack = new Stack<Node>();
-             var queue = new Queue<Node>();
+            var queue = new Queue<Node>();
             queue.Enqueue(startNode);
 
             while (queue.Count != 0)
@@ -84,21 +99,26 @@ namespace treeFilter
                 }
                 else
                 {
-                    if (current.IsRoot())
-                    {
-                        return null;
-                    }
                     current.RemoveChildReferencesToNode()
                            .RemoveParentReferencesToNode();
                 }
             }
+            return stack;
+        }
 
-            //walk back up from bottom level of included nodes
+        /// <summary>
+        /// Bottom up depth first traversal of included nodes which removes dangling excluded parent references.
+        /// Accounts for included nodes which have more than one parent 
+        /// where at least one parent is on an excluded branch
+        /// </summary>
+        private static void CheckStackForDanglingExcludedParents(int[] includedNodes, Stack<Node> stack)
+        {
             while (stack.Count != 0)
             {
                 var current = stack.Pop();
                 //all nodes in stack are included
                 //do they have any excluded parents?
+                if (current.Parents.Count <= 1) continue;
                 for (var i = 0; i < current.Parents.Count; i++)
                 {
                     var parent = current.Parents.ElementAt(i);
@@ -108,59 +128,6 @@ namespace treeFilter
                     i--;
                 }
             }
-            return startNode;
-        }
-    }
-
-
-    public static class Extensions
-    {
-        /// <summary>
-        /// A node with no parents is a root node
-        /// </summary>
-        public static bool IsRoot(this Node node)
-        {
-            return !node.Parents.Any();
-        }
-
-        public static Node RemoveParentReferencesToNode(this Node node)
-        {
-            foreach (var child in node.Children)
-            {
-                child.Parents.Remove(node);
-            }
-            return node;
-        }
-
-        public static Node RemoveChildReferencesToNode(this Node node)
-        {
-            foreach (var parent in node.Parents)
-            {
-                parent.Children.Remove(node);
-            }
-            return node;
-        }
-
-        public static bool IsIncluded(this Node node, int[] includedNodes)
-        {
-            return node.IsExplicitlyIncluded(includedNodes)
-            || node.AncestorsAreExplicitlyIncluded(includedNodes)
-            || node.DescendantsAreExplicitlyIncluded(includedNodes);
-        }
-
-        private static bool IsExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)
-        {
-            return explicitlyIncludedNodes.Contains(node.Id);
-        }
-
-        private static bool AncestorsAreExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)
-        {
-            return node.FirstOrDefaultAncestor(n => explicitlyIncludedNodes.Contains(n.Id)) != null;
-        }
-
-        private static bool DescendantsAreExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)
-        {
-            return node.FirstOrDefaultDescendant(n => explicitlyIncludedNodes.Contains(n.Id)) != null;
         }
     }
 }
