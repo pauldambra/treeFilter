@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -12,45 +10,6 @@ namespace treeFilter
     [TestFixture]
     public class SpeedTests
     {
-        [Test]
-        public void FilterLargeGraphSpeed()
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            var timings = new List<long>
-                {
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                };
-            timings.Average().Should().BeLessOrEqualTo(100);
-        }
-
-        [Test]
-        public void AnalyseClosureSpeed()
-        {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            var timings = new List<long>
-                {
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
-                };
-            timings.Average().Should().BeLessOrEqualTo(100);
-        }
 
         [Test]
         public void AnalyseConditionalCopySpeed()
@@ -81,16 +40,6 @@ namespace treeFilter
             return idAndTree;
         }
 
-        private static long RunAnalyse(dynamic idAndTree, Stopwatch stopwatch)
-        {
-            Node tree = idAndTree.Tree;
-            var filterStart = stopwatch.ElapsedMilliseconds;
-            NodeClosureAnalyser.Analyse(tree);
-            var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
-            Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
-            return filterMark;
-        }
-
         private static long RunConditionalCopy(dynamic idAndTree, Stopwatch stopwatch)
         {
             var rand = new Random();
@@ -106,25 +55,7 @@ namespace treeFilter
             var includedNodes = tree.DescendantsWhere(n => filter.Contains(n.Id));
 
             var filterStart = stopwatch.ElapsedMilliseconds;
-            var root = Node.ConditionallyCopyTree(includedNodes);
-            var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
-            Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
-            return filterMark;
-        }
-
-        private static long RunFilter(dynamic idAndTree, Stopwatch stopwatch)
-        {
-            var rand = new Random();
-            var filter = new List<int>
-                {
-                    rand.Next(0, idAndTree.MaxId),
-                    rand.Next(0, idAndTree.MaxId),
-                    rand.Next(0, idAndTree.MaxId),
-                    rand.Next(0, idAndTree.MaxId)
-                };
-            Node tree = idAndTree.Tree;
-            var filterStart = stopwatch.ElapsedMilliseconds;
-            Node.Filter(tree, filter.ToArray());
+            Node.ConditionallyCopyTree(includedNodes);
             var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
             Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
             return filterMark;

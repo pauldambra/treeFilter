@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -31,34 +28,10 @@ namespace treeFilter
         }
 
         [Test]
-        public void CanTestForExplicitlyIncludedAncestors()
-        {
-            var three = _root.FirstOrDefaultDescendant(n => n.Id == 3);
-            three.AnyAncestor(n => n.IsExplicitlyIncluded).Should().BeFalse();
-            
-            three.IsExplicitlyIncluded = true;
-
-            var ten = _root.FirstOrDefaultDescendant(n => n.Id == 10);
-            ten.AnyAncestor(n => n.IsExplicitlyIncluded).Should().BeTrue();
-        }
-
-
-        [Test]
         public void CanTestForListOfNodes()
         {
             var matches = _root.DescendantsWhere(n => new[] { 2, 5, 9 }.Contains(n.Id));
             matches.Should().HaveCount(3);
-        }
-
-        [Test]
-        public void CanTestForExplicitlyIncludedDescendants()
-        {
-            var ten = _root.FirstOrDefaultDescendant(n => n.Id == 10);
-            ten.AnyDescendant(n => n.IsExplicitlyIncluded).Should().BeFalse();
-
-            ten.IsExplicitlyIncluded = true;
-            var three = _root.FirstOrDefaultDescendant(n => n.Id == 3);
-            ten.AnyDescendant(n => n.IsExplicitlyIncluded).Should().BeTrue();
         }
 
         [Test]

@@ -47,12 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CloneTests.cs" />
-    <Compile Include="NodeClosureAnalyser.cs" />
-    <Compile Include="NodeClosureAnalyserTests.cs" />
+    <Compile Include="INode.cs" />
     <Compile Include="NodeNavigationTests.cs" />
-    <Compile Include="NodeFilterTests.cs" />
     <Compile Include="Node.cs" />
-    <Compile Include="NodeStateChangeTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="SpeedTests.cs" />
