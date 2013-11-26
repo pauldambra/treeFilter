@@ -22,13 +22,20 @@ namespace treeFilter
                 {
                     RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
                     RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch),
-                    RunFilter(BuildAndMeasureTree(stopwatch), stopwatch)
+                };
+            timings.Average().Should().BeLessOrEqualTo(100);
+        }
+
+        [Test]
+        public void AnalyseClosureSpeed()
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var timings = new List<long>
+                {
+                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
+                    RunAnalyse(BuildAndMeasureTree(stopwatch), stopwatch),
                 };
             timings.Average().Should().BeLessOrEqualTo(100);
         }
@@ -37,9 +44,19 @@ namespace treeFilter
         {
             var before = stopwatch.ElapsedMilliseconds;
             //has c9000 nodes at the bottom level
-            var idAndTree = GraphBuilder.BuildLargeGraph(5, 40);
+            var idAndTree = GraphBuilder.BuildLargeGraph(5, 30);
             Debug.WriteLine("Took {0} milliseconds to build the graph", stopwatch.ElapsedMilliseconds - before);
             return idAndTree;
+        }
+
+        private static long RunAnalyse(dynamic idAndTree, Stopwatch stopwatch)
+        {
+            Node tree = idAndTree.Tree;
+            var filterStart = stopwatch.ElapsedMilliseconds;
+            NodeClosureAnalyser.Analyse(tree);
+            var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
+            Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
+            return filterMark;
         }
 
         private static long RunFilter(dynamic idAndTree, Stopwatch stopwatch)

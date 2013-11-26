@@ -42,6 +42,14 @@ namespace treeFilter
             ten.AnyAncestor(n => n.IsExplicitlyIncluded).Should().BeTrue();
         }
 
+
+        [Test]
+        public void CanTestForListOfNodes()
+        {
+            var matches = _root.DescendantsWhere(n => new[] { 2, 5, 9 }.Contains(n.Id));
+            matches.Should().HaveCount(3);
+        }
+
         [Test]
         public void CanTestForExplicitlyIncludedDescendants()
         {
