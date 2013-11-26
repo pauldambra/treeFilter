@@ -38,9 +38,15 @@ namespace treeFilter
                    || node.DescendantsAreExplicitlyIncluded(includedNodes);
         }
 
-        private static bool IsExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)
+        public static bool IsExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)
         {
             return explicitlyIncludedNodes.Contains(node.Id);
+        }
+
+        public static bool IsImplicitlyIncluded(this Node node, int[] explicitlyIncludedNodes)
+        {
+            return node.AncestorsAreExplicitlyIncluded(explicitlyIncludedNodes)
+                   || node.DescendantsAreExplicitlyIncluded(explicitlyIncludedNodes);
         }
 
         private static bool AncestorsAreExplicitlyIncluded(this Node node, IEnumerable<int> explicitlyIncludedNodes)

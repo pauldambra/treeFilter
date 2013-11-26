@@ -31,6 +31,29 @@ namespace treeFilter
         }
 
         [Test]
+        public void CanTestForExplicitlyIncludedAncestors()
+        {
+            var three = _root.FirstOrDefaultDescendant(n => n.Id == 3);
+            three.AnyAncestor(n => n.IsExplicitlyIncluded).Should().BeFalse();
+            
+            three.IsExplicitlyIncluded = true;
+
+            var ten = _root.FirstOrDefaultDescendant(n => n.Id == 10);
+            ten.AnyAncestor(n => n.IsExplicitlyIncluded).Should().BeTrue();
+        }
+
+        [Test]
+        public void CanTestForExplicitlyIncludedDescendants()
+        {
+            var ten = _root.FirstOrDefaultDescendant(n => n.Id == 10);
+            ten.AnyDescendant(n => n.IsExplicitlyIncluded).Should().BeFalse();
+
+            ten.IsExplicitlyIncluded = true;
+            var three = _root.FirstOrDefaultDescendant(n => n.Id == 3);
+            ten.AnyDescendant(n => n.IsExplicitlyIncluded).Should().BeTrue();
+        }
+
+        [Test]
         public void CanBuildGraph()
         {
             _root.Should().NotBeNull();

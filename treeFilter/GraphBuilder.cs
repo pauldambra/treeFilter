@@ -50,7 +50,7 @@ namespace treeFilter
             var builtLevel = 0;
 
             var root = new Node {Id = id++};
-            var queue = new Queue<Node>();
+            var queue = new Queue<Node>(100000000);
             queue.Enqueue(root);
 
             while (builtLevel < depth)
