@@ -240,5 +240,80 @@ namespace treeFilter
         {
             return Id;
         }
+
+        public static Node ConditionallyCopyTree(IEnumerable<Node> explicitlyncludedNodes)
+        {
+            Node root = null;
+            //copy the explicit nodes to a new collection.
+            foreach (var exp in explicitlyncludedNodes)
+            {
+                var newNode = exp.CloneBranch();
+                root = exp.CloneAncestors(newNode, root);
+
+            }
+            return root;
+        }
+
+        public Node Clone()
+        {
+            return new Node {Id = Id};
+        }
+
+        public Node CloneBranch()
+        {
+            var n = new Node {Id = Id};
+            ProcessChildren(this, n);
+            return n;
+        }
+
+        private static void ProcessChildren(Node templateParent, Node copyParent)
+        {
+            var stack = new Stack<Node>();
+            foreach (var child in templateParent.Children)
+            {
+                stack.Push(child);
+            }
+            while (stack.Count != 0)
+            {
+                var template = stack.Pop();
+                var copy = new Node { Id = template.Id };
+                copy.Parents.Add(copyParent);
+                copyParent.Children.Add(copy);
+                ProcessChildren(template, copy);
+            }
+        }
+
+        public Node CloneAncestors(Node clone, Node root)
+        {
+            ProcessParents(this, clone, root);
+            return clone.FirstOrDefaultAncestor(n => n.Parents.Count == 0);
+        }
+
+        private static void ProcessParents(Node template, Node clone, Node root)
+        {
+            var stack = new Stack<Node>();
+            foreach (var parent in template.Parents)
+            {
+                stack.Push(parent);
+            }
+            while (stack.Count != 0)
+            {
+                var current = stack.Pop();
+                Node targetParent;
+                
+                if (root == null)
+                {
+                    targetParent = new Node {Id = current.Id};
+                }
+                else
+                {
+                    targetParent = root.FirstOrDefaultDescendant(n => n.Id == current.Id) ?? new Node { Id = current.Id };
+                }
+                
+                clone.Parents.Add(targetParent);
+                targetParent.Children.Add(clone);
+                ProcessParents(current, targetParent, root);
+            }
+        }
     }
 }

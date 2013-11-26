@@ -40,6 +40,20 @@ namespace treeFilter
             timings.Average().Should().BeLessOrEqualTo(100);
         }
 
+        [Test]
+        public void AnalyseConditionalCopySpeed()
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var timings = new List<long>
+                {
+                    RunConditionalCopy(BuildAndMeasureTree(stopwatch), stopwatch),
+                    RunConditionalCopy(BuildAndMeasureTree(stopwatch), stopwatch),
+                };
+            timings.Average().Should().BeLessOrEqualTo(100);
+        }
+
         private static dynamic BuildAndMeasureTree(Stopwatch stopwatch)
         {
             var before = stopwatch.ElapsedMilliseconds;
@@ -54,6 +68,27 @@ namespace treeFilter
             Node tree = idAndTree.Tree;
             var filterStart = stopwatch.ElapsedMilliseconds;
             NodeClosureAnalyser.Analyse(tree);
+            var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
+            Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
+            return filterMark;
+        }
+
+        private static long RunConditionalCopy(dynamic idAndTree, Stopwatch stopwatch)
+        {
+            var rand = new Random();
+            var filter = new List<int>
+                {
+                    rand.Next(0, idAndTree.MaxId),
+                    rand.Next(0, idAndTree.MaxId),
+                    rand.Next(0, idAndTree.MaxId),
+                    rand.Next(0, idAndTree.MaxId)
+                };
+
+            Node tree = idAndTree.Tree;
+            var includedNodes = tree.DescendantsWhere(n => filter.Contains(n.Id));
+
+            var filterStart = stopwatch.ElapsedMilliseconds;
+            var root = Node.ConditionallyCopyTree(includedNodes);
             var filterMark = stopwatch.ElapsedMilliseconds - filterStart;
             Debug.WriteLine("took {0} milliseconds to filter tree", filterMark);
             return filterMark;

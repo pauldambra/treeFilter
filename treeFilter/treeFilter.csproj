@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloneTests.cs" />
     <Compile Include="NodeClosureAnalyser.cs" />
     <Compile Include="NodeClosureAnalyserTests.cs" />
     <Compile Include="NodeNavigationTests.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="SpeedTests.cs" />
-    <Compile Include="StepwiseTests.cs" />
+    <Compile Include="ConditionalCopyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
